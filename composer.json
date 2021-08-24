@@ -1,7 +1,7 @@
 {
-    "name": "miladimos/package-skeleton",
+    "name": "laravelir/attachmentable",
     "description": "test description",
-    "homepage": "https://github.com/miladimos/package-skeleton",
+    "homepage": "https://github.com/laravelir/attachmentable",
     "type": "library",
     "keywords": [
         "laravel",
@@ -9,7 +9,9 @@
         "laravel support",
         "lumen packages",
         "laravel packages",
-        "lumen support"
+        "lumen support",
+        "attachmentable",
+        "laravel-attachmentable"
     ],
     "authors": [
         {
@@ -21,26 +23,26 @@
     ],
     "autoload": {
         "psr-4": {
-            "Miladimos\\Package\\": "src/"
+            "Laravelir\\Attachmentable\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Miladimos\\Package\\Tests\\": "tests"
+            "Laravelir\\Attachmentable\\Tests\\": "tests"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "PackageServiceProvider"
+                "AttachmentableServiceProvider"
             ],
             "aliases": {
-                "Package": "Miladimos\\Package\\Facades\\PackageFacade"
+                "Attachmentable": "Laravelir\\Attachmentable\\Facades\\AttachmentableFacade"
             }
         }
     },
     "require": {
-        "php": ">=7.2"
+        "php": ">=7.4"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.4"

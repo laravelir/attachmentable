@@ -1,17 +1,17 @@
 <?php
 
-namespace Miladimos\Package\Models;
+namespace Laravelir\Attachmentable\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class PackageModel extends Model
+class Attachment extends Model
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'tables';
+    protected $table = 'attachmentables';
 
     // protected $fillable = ['name'];
 
