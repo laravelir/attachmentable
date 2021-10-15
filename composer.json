@@ -34,7 +34,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "AttachmentableServiceProvider"
+                "Laravelir\\Attachmentable\\Providers\\AttachmentableServiceProvider"
             ],
             "aliases": {
                 "Attachmentable": "Laravelir\\Attachmentable\\Facades\\AttachmentableFacade"
@@ -42,7 +42,7 @@
         }
     },
     "require": {
-        "php": ">=7.4"
+        "php": ">=7.4|^8.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.4"

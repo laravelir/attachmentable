@@ -3,7 +3,7 @@
 namespace Laravelir\Attachmentable\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Laravelir\Attachmentable\Console\Commands\InstallAttachmentableCommand;
+use Laravelir\Attachmentable\Console\Commands\InstallPackageCommand;
 use Laravelir\Attachmentable\Facades\AttachmentableFacade;
 
 class AttachmentableServiceProvider extends ServiceProvider
@@ -48,7 +48,7 @@ class AttachmentableServiceProvider extends ServiceProvider
     private function registerCommands()
     {
         $this->commands([
-            InstallAttachmentableCommand::class,
+            InstallPackageCommand::class,
         ]);
     }
 

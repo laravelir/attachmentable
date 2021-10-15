@@ -4,7 +4,7 @@ namespace Laravelir\Attachmentable\Console\Commands;
 
 use Illuminate\Console\Command;
 
-class InstallAttachmentableCommand extends Command
+class InstallPackageCommand extends Command
 {
     protected $signature = 'attachmentable:install';
 
