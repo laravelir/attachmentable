@@ -2,6 +2,7 @@
 
 namespace Laravelir\Attachmentable\Providers;
 
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\ServiceProvider;
 use Laravelir\Attachmentable\Facades\AttachmentableFacade;
@@ -56,20 +57,8 @@ class AttachmentableServiceProvider extends ServiceProvider
 
     protected function publishMigrations()
     {
-        if (empty(File::glob(database_path('migrations/*_create_attachmentables_tables.php')))) {
-            $timestamp = date('Y_m_d_His', time());
-
-            $this->publishes([
-                __DIR__ . '/../../database/migrations/create_attachmentables_table.stub.php' => database_path() . "/migrations/{$timestamp}_create_attachmentables_tables.php",
-            ], 'attachmentable-migrations');
-
-        } else {
-            $list  = File::glob(database_path('migrations\*_create_attachmentables_tables.php'));
-            collect($list)->each(function ($item) {
-                File::delete($item);
-            });
-
-            $this->publishMigrations();
-        }
+        $this->publishes([
+            __DIR__ . '/../../database/migrations/create_attachmentables_table.stub.php' => database_path() . "/migrations//" . date('Y_m_d_His', time()) . "_create_attachmentables_tables.php",
+        ], 'attachmentable-migrations');
     }
 }
