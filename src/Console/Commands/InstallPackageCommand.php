@@ -3,6 +3,7 @@
 namespace Laravelir\Attachmentable\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
 
 class InstallPackageCommand extends Command
 {
@@ -14,24 +15,33 @@ class InstallPackageCommand extends Command
     {
         $this->line("\t... Welcome To Attachmentable Installer ...");
 
+        //config
+        if (File::exists(config_path('attachmentable.php'))) {
+            $confirm = $this->confirm("attachmentable.php already exist. Do you want to overwrite?");
+            if ($confirm) {
+                $this->publishConfig();
+                $this->info("config overwrite finished");
+            } else {
+                $this->info("skipped config publish");
+            }
+        } else {
+            $this->publishConfig();
+            $this->info("config published");
+        }
+
 
         $this->info("Attachmentable Successfully Installed.\n");
-        $this->info("\t\tGood Luck.");
+        $this->info("\t\tStar me on Github");
     }
 
-    //       //config
-    //       if (File::exists(config_path('attachmentable.php'))) {
-    //         $confirm = $this->confirm("attachmentable.php already exist. Do you want to overwrite?");
-    //         if ($confirm) {
-    //             $this->publishConfig();
-    //             $this->info("config overwrite finished");
-    //         } else {
-    //             $this->info("skipped config publish");
-    //         }
-    //     } else {
-    //         $this->publishConfig();
-    //         $this->info("config published");
-    //     }
+    private function publishConfig()
+    {
+        $this->call('vendor:publish', [
+            '--provider' => "Laravelir\Attachmentable\Providers\AttachmentableServiceProvider",
+            '--tag'      => 'attachmentable-config',
+            '--force'    => true
+        ]);
+    }
 
     //     //assets
     //     if (File::exists(public_path('attachmentable'))) {
@@ -64,14 +74,6 @@ class InstallPackageCommand extends Command
     //     $this->call('migrate');
     // }
 
-    // private function publishConfig()
-    // {
-    //     $this->call('vendor:publish', [
-    //         '--provider' => "Laravelir\Attachmentable\Providers\AttachmentableServiceProvider",
-    //         '--tag'      => 'config',
-    //         '--force'    => true
-    //     ]);
-    // }
 
     // private function publishMigration()
     // {

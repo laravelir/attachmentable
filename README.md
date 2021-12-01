@@ -19,8 +19,8 @@ composer require laravelir/attachmentable
 Laravelir\Attachmentable\Providers\AttachmentableServiceProvider::class,
 ```
 
-3. Run the command below to publish the package config file config/attachmentable.php:
+1. Run the command below to install package:
 
 ```
-php artisan vendor:publish
+php artisan attachmentable:install
 ```

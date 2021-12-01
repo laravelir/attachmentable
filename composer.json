@@ -1,6 +1,6 @@
 {
     "name": "laravelir/attachmentable",
-    "description": "test description",
+    "description": "A package for attachment files to models",
     "homepage": "https://github.com/laravelir/attachmentable",
     "type": "library",
     "keywords": [
@@ -11,13 +11,15 @@
         "laravel packages",
         "lumen support",
         "attachmentable",
+        "laravel file",
+        "laravel upload",
         "laravel-attachmentable"
     ],
     "authors": [
         {
             "name": "miladimos",
-            "email": "message.tome1331@gmail.com",
-            "role": "maintaner",
+            "email": "miladimos@outlook.com",
+            "role": "maintainer",
             "homepage": "https://github.com/miladimos"
         }
     ],

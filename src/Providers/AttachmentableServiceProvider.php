@@ -26,7 +26,6 @@ class AttachmentableServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->registerCommands();
-            $this->registerPublishes();
             $this->publishConfig();
         }
     }
@@ -36,13 +35,6 @@ class AttachmentableServiceProvider extends ServiceProvider
         $this->app->bind('attachmentable', function ($app) {
             return new AttachmentableFacade();
         });
-    }
-
-    private function registerPublishes()
-    {
-        $this->publishes([
-            __DIR__ . '/../../config/attachmentable.php' => config_path('attachmentable.php')
-        ], 'attachmentable-config');
     }
 
     private function registerCommands()
