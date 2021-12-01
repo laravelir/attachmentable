@@ -44,10 +44,16 @@
         }
     },
     "require": {
-        "php": ">=7.4|^8.0"
+        "php": ">=7.4|^8.0",
+        "miladimos/laravel-toolkit": "^0.9.7"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.4"
+    },
+    "scripts": {
+        "post-package-update": [
+            "php artisan vendor:publish --provider=Laravelir\\Attachmentable\\Providers\\AttachmentableServiceProvider --tag=attachmentable-config --force"
+        ]
     },
     "minimum-stability": "stable",
     "license": "MIT"

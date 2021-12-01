@@ -23,10 +23,10 @@ class AttachmentableServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->publishConfig();
 
         if ($this->app->runningInConsole()) {
             $this->registerCommands();
-            $this->publishConfig();
         }
     }
 
