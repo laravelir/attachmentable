@@ -21,12 +21,27 @@ trait Attachmentable
         return $this->attachments->where('key', $key)->first();
     }
 
-    public function attachOne()
+    public function attachOne(UploadedFile $file, array $option = null)
     {
         # code...
     }
 
-    public function attach()
+    public function hasAttachment($key)
+    {
+        # code...
+    }
+
+    public function clearAttachments($group)
+    {
+        # code...
+    }
+
+    public function attachFromUrl($url, array $option = null)
+    {
+        # code...
+    }
+
+    public function attach($files, array $option = null)
     {
         # code...
     }

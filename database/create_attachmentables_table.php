@@ -17,18 +17,16 @@ class CreateAttachmentablesTable extends Migration
             $table->id();
             $table->uuid('uuid');
             $table->morphs('attachmentable');
-            $table->string('disk', 32);
-            $table->string('filename', 255);
-            $table->string('title', 92)->nullable();
-            $table->text('description')->nullable();
-            $table->string('filetype', 512)->change();
-            $table->string('group')->nullable()->after('key');
-
+            $table->string('disk', 15);
             $table->string('path');
+            $table->string('original_name', 255);
+            $table->string('name', 255)->unique();
+            $table->text('description')->nullable();
             $table->string('key');
-            $table->string('mime_type')->nullable();
+            $table->string('group')->nullable();
+            $table->string('filetype', 512);
             $table->string('size')->nullable();
-            $table->longText('metadata')->nullable();
+            $table->longText('meta')->nullable();
             $table->timestamps();
         });
     }

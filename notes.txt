@@ -1,2 +1,6 @@
 add cleaner
 add attach from url
+
+add image optimizer
+
+add jobs, events for upload, image process
