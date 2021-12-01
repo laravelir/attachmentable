@@ -6,6 +6,6 @@ final class CanNotAttachFile extends BaseException
 {
     public static function create(string $diskName): self
     {
-        return new static("There is no filesystem disk named `{$diskName}`");
+        return new static("The filesystem disk not valid `{$diskName}`");
     }
 }

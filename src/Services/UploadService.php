@@ -1,34 +1,34 @@
 <?php
 
-namespace App\Traits;
+namespace Laravelir\Attachmentable\Services;
 
-use Carbon\Carbon;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Facades\Image;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-trait FileUploader
+
+final class UploadService extends Service
 {
-    private $disk = 'public';
-
     private $defaultUploadFolderName = 'uploads';
 
-    private $ds = DIRECTORY_SEPARATOR;
 
-    /**
-     * Image Sizes
-     *
-     * @var string
-     */
-    private $sizes = [
-        'thumbnail' => [
-            'width' => '120',
-            'height' => '120'
-        ],
-        'small' => '',
-        'medium' => '',
-        'original' => '',
-    ];
+    public $filename;
+
+    public $file;
+
+    public $options;
+
+
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    public function name($name)
+    {
+        $this->filename = $name;
+        return $this;
+    }
 
     public function uploadOneFile(UploadedFile $uploadedFile, $path = null)
     {
@@ -69,7 +69,6 @@ trait FileUploader
 
         return false;
     }
-
 
     public function uploadOneImage(UploadedFile $uploadedFile, $path = null)
     {
@@ -128,5 +127,4 @@ trait FileUploader
     {
         Storage::disk($disk)->delete($folder . $filename);
     }
-
 }

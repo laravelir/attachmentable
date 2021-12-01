@@ -24,9 +24,7 @@ class CreateAttachmentablesTable extends Migration
             $table->text('description')->nullable();
             $table->string('key');
             $table->string('group')->nullable();
-            $table->string('filetype', 512);
-            $table->string('size')->nullable();
-            $table->longText('meta')->nullable();
+            $table->longText('meta')->nullable(); // size ext mime , ...
             $table->timestamps();
         });
     }

@@ -8,6 +8,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Lang;
 use Laravelir\Attachmentable\Models\Attachment;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Laravelir\Attachmentable\Services\UploadService;
 
 trait Attachmentable
 {

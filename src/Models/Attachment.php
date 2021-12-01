@@ -236,7 +236,7 @@ class Attachment extends Model
 
     public function getExtensionAttribute()
     {
-        return $this->getExtension();
+        return pathinfo($this->original_name, PATHINFO_EXTENSION);
     }
 
 
@@ -402,16 +402,6 @@ class Attachment extends Model
 
         return $this->filepath = $ext !== null ? $name . '.' . $ext : $name;
     }
-
-
-    /**
-     * Returns the file extension.
-     */
-    public function getExtension()
-    {
-        return FileHelper::extension($this->filename);
-    }
-
 
     /**
      * Generate a temporary url at which the current file can be downloaded until $expire
