@@ -24,3 +24,47 @@ Laravelir\Attachmentable\Providers\AttachmentableServiceProvider::class,
 ```
 php artisan attachmentable:install
 ```
+
+## Uses
+
+First add `Attachmentable` trait to models that you want have attachments
+
+```php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Laravelir\Attachmentable\Traits\Attachmentable;
+
+class Post extends Model
+{
+    use HasFactory,
+        Attachmentable;
+}
+
+```
+
+### Methods
+
+in controllers you have these methods:
+
+```php
+
+namespace App\Http\Controllers;
+
+use App\Models\Post;
+
+class PostController extends Controller
+{
+    public function index()
+    {
+        $post = Post::find(1);
+
+        $post->attachments // return all attachments
+
+        
+    }
+}
+
+```
