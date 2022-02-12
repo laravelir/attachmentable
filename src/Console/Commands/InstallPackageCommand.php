@@ -64,21 +64,4 @@ class InstallPackageCommand extends Command
         ]);
     }
 
-    // protected function publishMigrations()
-    // {
-    //     if (empty(File::glob(database_path('migrations/*_create_attachmentables_tables.php')))) {
-
-    //         $this->publishes([
-    //             __DIR__ . '/../../database/migrations/create_attachmentables_table.stub.php' => database_path() . "/migrations//" . date('Y_m_d_His', time()) . "_create_attachmentables_tables.php",
-    //         ], 'attachmentable-migrations');
-    //     } else {
-    //         $list  = File::glob(database_path('migrations\*_create_attachmentables_tables.php'));
-    //         collect($list)->each(function ($item) {
-    //             File::delete($item);
-    //             dd("delete");
-    //         });
-
-    //         Artisan::call('php artisan vendor:publish --provider=Laravelir\\Attachmentable\\Providers\\AttachmentableServiceProvider --tag=attachmentable-migrations --force');
-    //     }
-    // }
 }

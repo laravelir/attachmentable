@@ -2,8 +2,6 @@
 
 namespace Laravelir\Attachmentable\Providers;
 
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\ServiceProvider;
 use Laravelir\Attachmentable\Facades\AttachmentableFacade;
 use Laravelir\Attachmentable\Console\Commands\InstallPackageCommand;
@@ -14,10 +12,9 @@ class AttachmentableServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(__DIR__ . "/../../config/attachmentable.php", 'attachmentable');
+        $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
 
         $this->registerFacades();
-
-        $this->publishMigrations();
     }
 
     /**
@@ -30,6 +27,7 @@ class AttachmentableServiceProvider extends ServiceProvider
         $this->publishConfig();
 
         if ($this->app->runningInConsole()) {
+            $this->publishMigrations();
             $this->registerCommands();
         }
     }
@@ -58,7 +56,7 @@ class AttachmentableServiceProvider extends ServiceProvider
     protected function publishMigrations()
     {
         $this->publishes([
-            __DIR__ . '/../../database/migrations/create_attachmentables_table.stub.php' => database_path() . "/migrations//" . date('Y_m_d_His', time()) . "_create_attachmentables_tables.php",
+            __DIR__ . '/../../database/migrations/create_attachmentables_table.stub' => database_path() . "/migrations//" . date('Y_m_d_His', time()) . "_create_attachmentables_table.php",
         ], 'attachmentable-migrations');
     }
 }

@@ -25,6 +25,12 @@ Laravelir\Attachmentable\Providers\AttachmentableServiceProvider::class,
 php artisan attachmentable:install
 ```
 
+3. Run the command below to migrate database:
+
+```
+php artisan migrate
+```
+
 ## Uses
 
 First add `Attachmentable` trait to models that you want have attachments
