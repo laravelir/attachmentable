@@ -19,13 +19,13 @@ composer require laravelir/attachmentable
 Laravelir\Attachmentable\Providers\AttachmentableServiceProvider::class,
 ```
 
-1. Run the command below to install package:
+3. Run the command below to install package:
 
 ```
 php artisan attachmentable:install
 ```
 
-3. Run the command below to migrate database:
+4. Run the command below to migrate database:
 
 ```
 php artisan migrate
