@@ -2,22 +2,22 @@
 
 namespace Laravelir\Attachmentable\Services;
 
+use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Storage;
 
 
-final class UploadService extends Service
+final class AttachmentService extends Service
 {
     private $defaultUploadFolderName = 'uploads';
-
 
     public $filename;
 
     public $file;
 
     public $options;
-
 
     public function __construct()
     {
@@ -123,8 +123,8 @@ final class UploadService extends Service
         }
     }
 
-    public function deleteOne($folder = null, $filename = null, $disk = 'public')
+    public function deleteOne($folder = null, $filename = null, $disk = null)
     {
-        Storage::disk($disk)->delete($folder . $filename);
+        $this->disk()->delete($folder . $filename);
     }
 }

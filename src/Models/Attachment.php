@@ -3,6 +3,8 @@
 namespace Laravelir\Attachmentable\Models;
 
 use Carbon\Carbon;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Crypt;
 use Miladimos\Toolkit\Traits\HasUUID;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
@@ -27,48 +29,27 @@ class Attachment extends Model
         'metadata' => 'array',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        if (config('attachments.behaviors.cascade_delete')) {
+            static::deleting(function ($attachment) {
+                $attachment->deleteFile();
+            });
+        }
+    }
+
+    public function attachmentorable()
+    {
+        return $this->morphTo();
+    }
+
     public function attachmentable()
     {
         return $this->morphTo();
     }
 
-    /**
-     * Shortcut method to bind an attachment to a model
-     *
-     * @param string $uuid
-     * @param Model  $model   a model that uses HasAttachment
-     * @param array  $options filter options based on configuration key `attachments.attributes`
-     *
-     * @return Attachment|null
-     */
-    public static function attach($uuid, $model, $options = [])
-    {
-        /** @var Attachment $attachment */
-        $attachment = self::where('uuid', $uuid)->first();
-
-        if ( ! $attachment) {
-            return null;
-        }
-
-        // The dz_session_key is set by the build-in DropzoneController for security check
-        if ($attachment->metadata('dz_session_key')) {
-            $meta = $attachment->metadata;
-
-            unset($meta['dz_session_key']);
-
-            $attachment->metadata = $meta;
-        }
-
-        $options = Arr::only($options, config('attachments.attributes'));
-
-        $attachment->fill($options);
-
-        if ($found = $model->attachments()->where('key', '=', $attachment->key)->first()) {
-            $found->delete();
-        }
-
-        return $attachment->model()->associate($model)->save() ? $attachment : null;
-    }
 
 
     /**
@@ -153,21 +134,6 @@ class Attachment extends Model
         return $this;
     }
 
-    /*
-     * Model handling
-     */
-
-    /**
-     * Relationship: model
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
-     */
-    public function model()
-    {
-        return $this->morphTo();
-    }
-
-
     /**
      * Register an outputting model event with the dispatcher.
      *
@@ -179,36 +145,6 @@ class Attachment extends Model
     {
         static::registerModelEvent('outputting', $callback);
     }
-
-
-    /**
-     * Setup behaviors
-     */
-    protected static function boot()
-    {
-        parent::boot();
-
-        if (config('attachments.behaviors.cascade_delete')) {
-            static::deleting(function ($attachment) {
-                /** @var Attachment $attachment */
-
-                $attachment->deleteFile();
-            });
-        }
-
-        static::creating(function ($attachment) {
-            /** @var Attachment $attachment */
-
-            if (empty($attachment->uuid)) {
-                throw new \Exception('Failed to generated an UUID value');
-            }
-
-            if (empty($attachment->key)) {
-                $attachment->key = uniqid();
-            }
-        });
-    }
-
 
     public function getUuidAttribute()
     {
@@ -458,15 +394,6 @@ class Attachment extends Model
     }
 
 
-    /**
-     * Returns true if the storage engine is local.
-     *
-     * @return bool
-     */
-    protected function isLocalStorage()
-    {
-        return $this->disk == 'local';
-    }
 
 
     /**

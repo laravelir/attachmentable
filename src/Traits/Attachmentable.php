@@ -8,7 +8,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Lang;
 use Laravelir\Attachmentable\Models\Attachment;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
-use Laravelir\Attachmentable\Services\UploadService;
+use Laravelir\Attachmentable\Services\AttachmentService;
 
 trait Attachmentable
 {
@@ -47,6 +47,45 @@ trait Attachmentable
         # code...
     }
 
+    /**
+     * Shortcut method to bind an attachment to a model
+     *
+     * @param string $uuid
+     * @param Model  $model   a model that uses HasAttachment
+     * @param array  $options filter options based on configuration key `attachments.attributes`
+     *
+     * @return Attachment|null
+     */
+    public static function attach3($uuid, $model, $options = [])
+    {
+        /** @var Attachment $attachment */
+        $attachment = self::where('uuid', $uuid)->first();
+
+        if (!$attachment) {
+            return null;
+        }
+
+        // The dz_session_key is set by the build-in DropzoneController for security check
+        if ($attachment->metadata('dz_session_key')) {
+            $meta = $attachment->metadata;
+
+            unset($meta['dz_session_key']);
+
+            $attachment->metadata = $meta;
+        }
+
+        $options = Arr::only($options, config('attachments.attributes'));
+
+        $attachment->fill($options);
+
+        if ($found = $model->attachments()->where('key', '=', $attachment->key)->first()) {
+            $found->delete();
+        }
+
+        return $attachment->model()->associate($model)->save() ? $attachment : null;
+    }
+
+
     public function deleteOne()
     {
         # code
@@ -64,7 +103,7 @@ trait Attachmentable
         if ($file = $this->model->where('uuid', $id)->first()) {
             try {
                 /** @var \Bnb\Laravel\Attachments\Attachment $file */
-                if ( ! $file->output($disposition)) {
+                if (!$file->output($disposition)) {
                     abort(403, Lang::get('attachments::messages.errors.access_denied'));
                 }
             } catch (FileNotFoundException $e) {
@@ -77,7 +116,7 @@ trait Attachmentable
 
     public function attach2($fileOrPath, $options = [])
     {
-        if ( ! is_array($options)) {
+        if (!is_array($options)) {
             throw new \Exception('Attachment options must be an array');
         }
 
@@ -87,13 +126,13 @@ trait Attachmentable
 
         $attributes = Arr::only($options, config('attachments.attributes'));
 
-        if ( ! empty($attributes['key']) && $attachment = $this->attachments()->where('key', $attributes['key'])->first()) {
+        if (!empty($attributes['key']) && $attachment = $this->attachments()->where('key', $attributes['key'])->first()) {
             $attachment->delete();
         }
 
         /** @var Attachment $attachment */
         $attachment = app(AttachmentContract::class)->fill($attributes);
-        $attachment->filepath = ! empty($attributes['filepath']) ? $attributes['filepath'] : null;
+        $attachment->filepath = !empty($attributes['filepath']) ? $attributes['filepath'] : null;
 
         if (is_resource($fileOrPath)) {
             if (empty($options['filename'])) {

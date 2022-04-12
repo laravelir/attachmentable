@@ -27,7 +27,7 @@ abstract class Service
 
     public function __construct()
     {
-        $this->disk = config('attachmentable.disk');
+        $this->setDisk(config('attachmentable.disk'));
     }
 
     public function setDisk(string $disk)
@@ -41,4 +41,23 @@ abstract class Service
         return Storage::disk($this->disk);
     }
 
+    /**
+     * Returns true if the storage engine is local.
+     *
+     * @return bool
+     */
+    protected function isLocalStorage()
+    {
+        return $this->disk == 'local';
+    }
+
+    /**
+     * Returns true if the storage engine is public.
+     *
+     * @return bool
+     */
+    protected function isPublicStorage()
+    {
+        return $this->disk == 'public';
+    }
 }

@@ -21,7 +21,6 @@ if (!function_exists('attachmentable_locale')) {
     }
 }
 
-
 if (!function_exists('attachmentable_lang')) {
     function attachmentable_lang($key)
     {

@@ -16,13 +16,14 @@ class CreateAttachmentablesTable extends Migration
         Schema::create('attachmentables', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid');
+            $table->morphs('attachmentorable');
             $table->morphs('attachmentable');
             $table->string('disk', 15);
             $table->string('path');
             $table->string('original_name', 255);
             $table->string('name', 255)->unique();
             $table->text('description')->nullable();
-            $table->string('key');
+            $table->string('key')->nullable();
             $table->string('group')->nullable();
             $table->longText('meta')->nullable(); // size ext mime , ...
             $table->timestamps();

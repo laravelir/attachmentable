@@ -20,7 +20,7 @@ return [
      * local, public
      *
      */
-    'disk' => env('ATTACHMENTABLE_DISK', 'local'),
+    'disk' => env('ATTACHMENTABLE_DISK', 'public'),
 
     /**
      * The maximum upload file size of an item in bytes.
