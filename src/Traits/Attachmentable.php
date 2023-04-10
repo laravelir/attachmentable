@@ -2,19 +2,19 @@
 
 namespace Laravelir\Attachmentable\Traits;
 
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Lang;
 use Laravelir\Attachmentable\Models\Attachment;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
-use Laravelir\Attachmentable\Services\AttachmentService;
 
 trait Attachmentable
 {
-    public function attachments()
+    public function attachments(): MorphMany
     {
-        return $this->morphMany(Attachment::class, 'attachmentable');
+        return $this->morphMany(Attachment::class, 'attachmentable', 'attachmentables');
     }
 
     public function attachment(string $key)
@@ -47,15 +47,6 @@ trait Attachmentable
         # code...
     }
 
-    /**
-     * Shortcut method to bind an attachment to a model
-     *
-     * @param string $uuid
-     * @param Model  $model   a model that uses HasAttachment
-     * @param array  $options filter options based on configuration key `attachments.attributes`
-     *
-     * @return Attachment|null
-     */
     public static function attach3($uuid, $model, $options = [])
     {
         /** @var Attachment $attachment */
@@ -84,7 +75,6 @@ trait Attachmentable
 
         return $attachment->model()->associate($model)->save() ? $attachment : null;
     }
-
 
     public function deleteOne()
     {

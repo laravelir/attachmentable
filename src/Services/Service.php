@@ -6,24 +6,9 @@ use Illuminate\Support\Facades\Storage;
 
 abstract class Service
 {
-    public $disk;
+    public string $disk;
 
-    public $ds = DIRECTORY_SEPARATOR;
-
-    /**
-     * Image Sizes
-     *
-     * @var string
-     */
-    private $sizes = [
-        'thumbnail' => [
-            'width' => '120',
-            'height' => '120'
-        ],
-        'small' => '',
-        'medium' => '',
-        'original' => '',
-    ];
+    public string $ds = DIRECTORY_SEPARATOR;
 
     public function __construct()
     {
@@ -36,7 +21,7 @@ abstract class Service
         return $this;
     }
 
-    public function disk()
+    public function disk(): \Illuminate\Contracts\Filesystem\Filesystem
     {
         return Storage::disk($this->disk);
     }
@@ -46,7 +31,7 @@ abstract class Service
      *
      * @return bool
      */
-    protected function isLocalStorage()
+    protected function isLocalStorage(): bool
     {
         return $this->disk == 'local';
     }
@@ -56,7 +41,7 @@ abstract class Service
      *
      * @return bool
      */
-    protected function isPublicStorage()
+    protected function isPublicStorage(): bool
     {
         return $this->disk == 'public';
     }

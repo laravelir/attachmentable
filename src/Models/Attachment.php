@@ -3,8 +3,11 @@
 namespace Laravelir\Attachmentable\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Str;
 use Miladimos\Toolkit\Traits\HasUUID;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
@@ -14,14 +17,8 @@ class Attachment extends Model
 {
     use HasUUID,
         RouteKeyNameUUID;
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'attachmentables';
 
-    // protected $fillable = ['name'];
+    protected $table = 'attachmentables';
 
     protected $guarded = [];
 
@@ -33,23 +30,22 @@ class Attachment extends Model
     {
         parent::boot();
 
-        if (config('attachments.behaviors.cascade_delete')) {
-            static::deleting(function ($attachment) {
-                $attachment->deleteFile();
-            });
-        }
+//        if (config('attachments.behaviors.cascade_delete')) {
+//            static::deleting(function ($attachment) {
+//                $attachment->deleteFile();
+//            });
+//        }
     }
 
-    public function attachmentorable()
+    public function attachmentorable(): MorphTo
     {
         return $this->morphTo();
     }
 
-    public function attachmentable()
+    public function attachmentable(): MorphTo
     {
         return $this->morphTo();
     }
-
 
 
     /**

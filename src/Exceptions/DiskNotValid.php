@@ -2,7 +2,7 @@
 
 namespace Laravelir\Attachmentable\Exceptions;
 
-final class CanNotAttachFile extends BaseException
+final class DiskNotValid extends BaseException
 {
     public static function create(string $diskName): self
     {

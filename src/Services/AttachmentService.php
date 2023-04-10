@@ -11,9 +11,9 @@ use Illuminate\Support\Facades\Storage;
 
 final class AttachmentService extends Service
 {
-    private $defaultUploadFolderName = 'uploads';
+    private string $defaultUploadFolderName;
 
-    public $filename;
+    public string $filename;
 
     public $file;
 
@@ -22,12 +22,28 @@ final class AttachmentService extends Service
     public function __construct()
     {
         parent::__construct();
+        $this->setDefaultUploadFolder();
+    }
+
+    private function setDefaultUploadFolder()
+    {
+        $this->defaultUploadFolderName = config('attachmentable.uploads.default_directory');
     }
 
     public function name($name)
     {
         $this->filename = $name;
         return $this;
+    }
+
+    public function attach($file)
+    {
+        //
+    }
+
+    public function detach($file)
+    {
+        //
     }
 
     public function uploadOneFile(UploadedFile $uploadedFile, $path = null)

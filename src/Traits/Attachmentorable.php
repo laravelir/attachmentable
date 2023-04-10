@@ -3,23 +3,17 @@
 namespace Laravelir\Attachmentable\Traits;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\File;
+use Illuminate\Http\UploadedFile;
 use Laravelir\Attachmentable\Models\Attachment;
-use Laravelir\Attachmentable\Services\AttachmentService;
 
 trait Attachmentorable
 {
     public function attachments()
     {
-        return $this->morphMany(Attachment::class, 'attachmentorable');
+        return $this->morphMany(Attachment::class, 'attachmentorable', 'attachmentables');
     }
 
-    public function attachment(string $key)
-    {
-        return $this->attachments->where('key', $key)->first();
-    }
-
-    public function attach(Model $model, $file, array $option = null): bool
+    public function attach(Model $model, UploadedFile $file, array $option = null): bool
     {
         if (!$model instanceof Model) {
             return false;
@@ -28,13 +22,12 @@ trait Attachmentorable
         $model->attachments()->create([
             'attachmentorable_id' => $this->id,
             'attachmentorable_type' => get_class($this),
-
         ]);
 
         return true;
     }
 
-    public function delete()
+    public function detach($id)
     {
         # code
     }

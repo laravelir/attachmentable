@@ -69,6 +69,7 @@ class PostController extends Controller
 
         $post->attachments // return all attachments
 
+        $post->attachment($file, $disk, $name);
         
     }
 }

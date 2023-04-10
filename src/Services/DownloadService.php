@@ -8,4 +8,9 @@ final class DownloadService extends Service
     {
         parent::__construct();
     }
+
+    public function download()
+    {
+        //
+    }
 }

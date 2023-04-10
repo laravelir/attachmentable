@@ -2,17 +2,10 @@
 
 // config file for laravelir/attachmentable
 return [
-    // All of Functionality in this Directory
+    // All Functionality in this Directory
     'base_directory' => env("ATTACHMENTABLE_BASE_DIR", 'attachments'),
 
     'attachment_model' => \Laravelir\Attachmentable\Models\Attachment::class,
-
-    /**
-     * en, fa
-     */
-    'locale' => [
-        'default' => 'en',
-    ],
 
     /**
      * List of disk names that you want to use for upload
@@ -27,4 +20,21 @@ return [
      * Adding a larger file will result in an exception.
      */
     'max_file_size' => 1024 * 1024 * 10,
+
+    'behaviors' => [
+        'cascade_delete' => true,
+    ],
+
+    'uploads' => [
+        'default_directory' =>'uploads',
+        'image' => [
+            'thumbnail' => [
+                'width' => '120',
+                'height' => '120'
+            ],
+            'small' => '',
+            'medium' => '',
+            'original' => '',
+        ]
+    ]
 ];
