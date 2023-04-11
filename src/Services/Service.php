@@ -2,7 +2,6 @@
 
 namespace Laravelir\Attachmentable\Services;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
 abstract class Service
@@ -123,7 +122,6 @@ abstract class Service
 
         return count($this->storageCommand('allFiles', $dir)) === 0;
     }
-
 
     protected function copyToStorage($localPath, $storagePath)
     {

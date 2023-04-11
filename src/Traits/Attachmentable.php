@@ -29,7 +29,8 @@ trait Attachmentable
 
         if ($file instanceof UploadedFile)
         {
-            $attachmentService->attach($file, $this);
+            if(! $attachmentService->attach($file, $this)) return false;
+            return true;
         }
 
         return false;

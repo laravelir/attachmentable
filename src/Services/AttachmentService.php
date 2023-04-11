@@ -3,13 +3,13 @@
 namespace Laravelir\Attachmentable\Services;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Intervention\Image\Facades\Image;
 
 
 final class AttachmentService extends Service
 {
-
     public string $filename;
 
     public $file;
@@ -23,9 +23,14 @@ final class AttachmentService extends Service
 
     public function attach($file, $attachmentable)
     {
-        if (!$file instanceof UploadedFile) {
+        if (! $file instanceof UploadedFile && $file->isValid()) {
             return false;
         }
+
+        if(! $attachmentable instanceof Model) {
+            return false;
+        }
+
 
         // $this->disk()->put();
 
@@ -42,44 +47,40 @@ final class AttachmentService extends Service
         $this->disk()->delete($file);
     }
 
-    public function uploadFile(UploadedFile $uploadedFile, $path = null)
+    public function uploadFile(UploadedFile $file, $path = null)
     {
-
         $path = $this->path($path);
 
-        if ($uploadedFile->isValid()) {
-            $year = Carbon::now()->year;
-            $month = Carbon::now()->month;
-            $day = Carbon::now()->day;
+        $year = Carbon::now()->year;
+        $month = Carbon::now()->month;
+        $day = Carbon::now()->day;
 
-            $fileName = $uploadedFile->getClientOriginalName();
-            $fileExt = $uploadedFile->getClientOriginalExtension();
-            $mimeType = $uploadedFile->getClientMimeType();
-            $fileSize = $uploadedFile->getSize();
+        $fileName = $file->getFilename();
+        $originalFileName = $file->getClientOriginalName();
+        $fileExt = $file->getClientOriginalExtension();
+        $mimeType = $file->getClientMimeType();
+        $fileSize = method_exists($file, 'getSize') ? $file->getSize() : $file->getClientSize();
 
-            $uploadPath = "{$path}{$this->ds}{$year}{$this->ds}{$month}{$this->ds}{$day}";
+        $uploadPath = "{$path}{$this->ds}{$year}{$this->ds}{$month}{$this->ds}{$day}";
 
-            $fullUploadedPath = public_path($uploadPath . $this->ds . $fileName);
+        $fullUploadedPath = public_path($uploadPath . $this->ds . $fileName);
 
-            $dirPath = public_path($uploadPath);
+        $dirPath = public_path($uploadPath);
 
-            $this->mkdir_if_not_exists($dirPath);
+        $this->mkdir_if_not_exists($dirPath);
 
-            if (file_exists($fullUploadedPath)) {
-                $finalFileName = Carbon::now()->timestamp . "-{$fileName}";
+        if (file_exists($fullUploadedPath)) {
+            $finalFileName = Carbon::now()->timestamp . "-{$fileName}";
 
-                $uploadedFile->move($dirPath, $finalFileName);
+            $file->move($dirPath, $finalFileName);
 
 
-                return $uploadPath . $this->ds . $finalFileName;
-            }
-
-            $uploadedFile->move($dirPath, $fileName);
-
-            return $uploadPath . $this->ds . $fileName;
+            return $uploadPath . $this->ds . $finalFileName;
         }
 
-        return false;
+        $file->move($dirPath, $fileName);
+
+        return $uploadPath . $this->ds . $fileName;
     }
 
     public function uploadImage(UploadedFile $uploadedFile, $path = null)
@@ -130,27 +131,6 @@ final class AttachmentService extends Service
         }
     }
 
-    public function fromPost($file, $disk = null)
-    {
-        if ($file === null) {
-            return null;
-        }
-
-        $this->filename = $file->getClientOriginalName();
-        $this->filesize = method_exists($file, 'getSize') ? $file->getSize() : $file->getClientSize();
-        $this->filetype = $file->getMimeType();
-        $this->filepath = $this->filepath ?: ($this->getStorageDirectory() . $this->getPartitionDirectory() . $this->getDiskName());
-        $this->filename = $file->getFilename();
-        $this->filesize = $file->getSize();
-        $this->filetype = $file->getMimeType();
-        $this->filepath = $this->filepath ?: ($this->getStorageDirectory() . $this->getPartitionDirectory() . $this->getDiskName());
-        $this->putFile($file->getRealPath(), $this->filepath);
-
-        $this->putFile($file->getRealPath(), $this->filepath);
-
-        return $this;
-    }
-
     public function output($disposition = 'inline')
     {
 
@@ -165,27 +145,13 @@ final class AttachmentService extends Service
         exit($this->getContents());
     }
 
-    protected function putFile($sourcePath, $filePath = null)
-    {
-        if ( ! $filePath) {
-            $filePath = $this->filepath;
-        }
+    public function isFile($file):bool {
+        return true;
+    }
 
-        if ( ! $this->isLocalStorage()) {
-            return $this->copyToStorage($sourcePath, $filePath);
-        }
+    public function isImage($file):bool {
+        return true;
 
-        $destinationPath = $this->getLocalRootPath() . '/' . pathinfo($filePath, PATHINFO_DIRNAME) . '/';
-
-        if (
-            ! FileHelper::isDirectory($destinationPath) &&
-            ! FileHelper::makeDirectory($destinationPath, 0777, true, true) &&
-            ! FileHelper::isDirectory($destinationPath)
-        ) {
-            trigger_error(error_get_last()['message'], E_USER_WARNING);
-        }
-
-        return FileHelper::copy($sourcePath, $destinationPath . basename($filePath));
     }
 
 }
