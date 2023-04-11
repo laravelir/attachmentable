@@ -1,12 +1,14 @@
 <?php
 
+use Illuminate\Support\Facades\Storage;
+
 // config file for laravelir/attachmentable
 return [
 
     /**
      * use your favorite filesystem.php disk
      */
-    'disk' => env('ATTACHMENTABLE_DISK', 'public'),
+    'disk' => env('ATTACHMENTABLE_DISK', Storage::getDefaultDriver()),
 
 
     // All Functionality in this Directory
@@ -26,6 +28,12 @@ return [
 
         'uploads' => [
             'default_directory' =>'uploads',
+
+            /**
+             * url : url($path)
+             *
+             */
+            'uploaded_file_path' => '',
             'image' => [
                 'thumbnail' => [
                     'width' => '120',

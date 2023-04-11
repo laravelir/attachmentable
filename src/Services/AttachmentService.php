@@ -28,28 +28,22 @@ final class AttachmentService extends Service
             return false;
         }
 
+        // $this->disk()->put();
+
         $attachmentable->attachments()->create([
             'attachmentorable_id' => auth()->user()->id,
             'attachmentorable_type' => get_class(auth()->user()),
         ]);
 
-        
+
     }
-
-    public function name($name)
-    {
-        $this->filename = $name;
-        return $this;
-    }
-
-
 
     public function detach($file)
     {
-        //
+        $this->disk()->delete($file);
     }
 
-    public function uploadOneFile(UploadedFile $uploadedFile, $path = null)
+    public function uploadFile(UploadedFile $uploadedFile, $path = null)
     {
 
         $path = $this->path($path);
@@ -89,7 +83,7 @@ final class AttachmentService extends Service
         return false;
     }
 
-    public function uploadOneImage(UploadedFile $uploadedFile, $path = null)
+    public function uploadImage(UploadedFile $uploadedFile, $path = null)
     {
 
         $path = $this->path($path);
@@ -130,11 +124,6 @@ final class AttachmentService extends Service
         return false;
     }
 
-    public function path($path)
-    {
-        return $this->defaultUploadFolderName . $this->ds . $path;
-    }
-
     function mkdir_if_not_exists($dirPath)
     {
         if (!file_exists($dirPath)) {
@@ -142,10 +131,6 @@ final class AttachmentService extends Service
         }
     }
 
-    public function deleteOne($folder = null, $filename = null, $disk = null)
-    {
-        $this->disk()->delete($folder . $filename);
-    }
 
 
     /**
@@ -162,73 +147,22 @@ final class AttachmentService extends Service
             return null;
         }
 
-        $this->disk = $this->disk ?: ($disk ?: Storage::getDefaultDriver());
         $this->filename = $uploadedFile->getClientOriginalName();
         $this->filesize = method_exists($uploadedFile, 'getSize') ? $uploadedFile->getSize() : $uploadedFile->getClientSize();
         $this->filetype = $uploadedFile->getMimeType();
         $this->filepath = $this->filepath ?: ($this->getStorageDirectory() . $this->getPartitionDirectory() . $this->getDiskName());
-        $this->putFile($uploadedFile->getRealPath(), $this->filepath);
-
-        return $this;
-    }
-
-
-    /**
-     * Creates a file object from a file on the disk.
-     *
-     * @param string $filePath source file
-     * @param string $disk     target storage disk
-     *
-     * @return $this|null
-     */
-    public function fromFile($filePath, $disk = null)
-    {
-        if ($filePath === null) {
-            return null;
-        }
-
-        $file = new FileObj($filePath);
-
-        $this->disk = $this->disk ?: ($disk ?: Storage::getDefaultDriver());
         $this->filename = $file->getFilename();
         $this->filesize = $file->getSize();
         $this->filetype = $file->getMimeType();
         $this->filepath = $this->filepath ?: ($this->getStorageDirectory() . $this->getPartitionDirectory() . $this->getDiskName());
         $this->putFile($file->getRealPath(), $this->filepath);
 
-        return $this;
-    }
-
-
-    /**
-     * Creates a file object from a stream
-     *
-     * @param resource $stream   source stream
-     * @param string   $filename the resource filename
-     * @param string   $disk     target storage disk
-     *
-     * @return $this|null
-     */
-    public function fromStream($stream, $filename, $disk = null)
-    {
-        if ($stream === null) {
-            return null;
-        }
-
-        $this->disk = $this->disk ?: ($disk ?: Storage::getDefaultDriver());
-
-        $driver = Storage::disk($this->disk);
-
-        $this->filename = $filename;
-        $this->filepath = $this->filepath ?: ($this->getStorageDirectory() . $this->getPartitionDirectory() . $this->getDiskName());
-
-        $driver->putStream($this->filepath, $stream);
-
-        $this->filesize = $driver->size($this->filepath);
-        $this->filetype = $driver->mimeType($this->filepath);
+        $this->putFile($uploadedFile->getRealPath(), $this->filepath);
 
         return $this;
     }
+
+
 
     /**
      * Register an outputting model event with the dispatcher.
@@ -241,100 +175,6 @@ final class AttachmentService extends Service
     {
         static::registerModelEvent('outputting', $callback);
     }
-
-    public function getUuidAttribute()
-    {
-        if ( ! empty($this->attributes['uuid'])) {
-            return $this->attributes['uuid'];
-        }
-
-        $generator = config('attachments.uuid_provider');
-
-        if (strpos($generator, '@') !== false) {
-            $generator = explode('@', $generator, 2);
-        }
-
-        if ( ! is_array($generator) && function_exists($generator)) {
-            return $this->uuid = call_user_func($generator);
-        }
-
-        if (is_callable($generator)) {
-            return $this->uuid = forward_static_call($generator);
-        }
-
-        throw new \Exception('Missing UUID provider configuration for attachments');
-    }
-
-
-    public function getExtensionAttribute()
-    {
-        return pathinfo($this->original_name, PATHINFO_EXTENSION);
-    }
-
-
-    public function getPathAttribute()
-    {
-        return pathinfo($this->filepath, PATHINFO_DIRNAME);
-    }
-
-
-    public function getUrlAttribute()
-    {
-        if ($this->isLocalStorage()) {
-            return $this->proxy_url;
-        } else {
-            return Storage::disk($this->disk)->url($this->filepath);
-        }
-    }
-
-
-    public function getUrlInlineAttribute()
-    {
-        if ($this->isLocalStorage()) {
-            return $this->proxy_url_inline;
-        } else {
-            return Storage::disk($this->disk)->url($this->filepath);
-        }
-    }
-
-
-    public function getProxyUrlAttribute()
-    {
-        return route('attachments.download', [
-            'id' => $this->uuid,
-            'name' => $this->extension ?
-                Str::slug(substr($this->filename, 0, -1 * strlen($this->extension) - 1)) . '.' . $this->extension :
-                Str::slug($this->filename)
-        ]);
-    }
-
-
-    public function getProxyUrlInlineAttribute()
-    {
-        return route('attachments.download', [
-            'id' => $this->uuid,
-            'name' => $this->extension ?
-                Str::slug(substr($this->filename, 0, -1 * strlen($this->extension) - 1)) . '.' . $this->extension :
-                Str::slug($this->filename),
-            'disposition' => 'inline',
-        ]);
-    }
-
-
-    public function toArray()
-    {
-        $attributes = parent::toArray();
-
-        return array_merge($attributes, [
-            'url' => $this->url,
-            'url_inline' => $this->url_inline,
-        ]);
-    }
-
-
-    /*
-     * File handling
-     */
 
     public function output($disposition = 'inline')
     {
@@ -480,19 +320,6 @@ final class AttachmentService extends Service
 
 
     /**
-     * If working with local storage, determine the absolute local path.
-     *
-     * @return string
-     */
-    protected function getLocalRootPath()
-    {
-        return storage_path() . '/app';
-    }
-
-
-
-
-    /**
      * Returns true if a directory contains no files.
      *
      * @param string|null $dir the directory path
@@ -590,9 +417,4 @@ final class AttachmentService extends Service
         return forward_static_call_array([$interface, $command], $args);
     }
 
-
-    public function getConnectionName()
-    {
-        return config('attachments.database.connection') ?? $this->connection;
-    }
 }

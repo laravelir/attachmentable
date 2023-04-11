@@ -5,3 +5,5 @@ add attach from url, stream ,
 add image optimizer
 
 add jobs, events for upload, image process
+
+add file to attachmentable by specific user logged in or ...
