@@ -2,6 +2,7 @@
 
 namespace Laravelir\Attachmentable\Services;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
 abstract class Service
@@ -10,9 +11,21 @@ abstract class Service
 
     public string $ds = DIRECTORY_SEPARATOR;
 
+    public string $defaultUploadFolderName;
+
+    // attachment model
+    public $model;
+
     public function __construct()
     {
+        $this->setupSetting();
+    }
+
+    public function setupSetting()
+    {
         $this->setDisk(config('attachmentable.disk'));
+        $this->defaultUploadFolderName = config('attachmentable.behaviors.uploads.default_directory');
+        $this->model = config('attachmentable.attachment_model');
     }
 
     public function setDisk(string $disk)
@@ -21,26 +34,16 @@ abstract class Service
         return $this;
     }
 
-    public function disk(): \Illuminate\Contracts\Filesystem\Filesystem
+    public function disk()
     {
         return Storage::disk($this->disk);
     }
 
-    /**
-     * Returns true if the storage engine is local.
-     *
-     * @return bool
-     */
     protected function isLocalStorage(): bool
     {
         return $this->disk == 'local';
     }
 
-    /**
-     * Returns true if the storage engine is public.
-     *
-     * @return bool
-     */
     protected function isPublicStorage(): bool
     {
         return $this->disk == 'public';

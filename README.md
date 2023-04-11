@@ -51,9 +51,28 @@ class Post extends Model
 
 ```
 
+
+and add `Attachmentorable` trait to User models
+
+```php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Laravelir\Attachmentable\Traits\Attachmentorable;
+
+class User extends Model
+{
+    use HasFactory,
+        Attachmentorable;
+}
+
+```
+
 ### Methods
 
-in controllers you have these methods:
+in controllers, with `Attachmentable` trait you have these methods:
 
 ```php
 
@@ -69,8 +88,14 @@ class PostController extends Controller
 
         $post->attachments // return all attachments
 
-        $post->attachment($file, $disk, $name);
+        $post->attachment($file, $disk, $name); // return attachment 
         
+        $post->attach();
+        
+        $post->detach();
+        
+        $post->clearAttachments();
+       
     }
 }
 

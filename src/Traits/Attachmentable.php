@@ -9,6 +9,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Lang;
 use Laravelir\Attachmentable\Models\Attachment;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Laravelir\Attachmentable\Services\AttachmentService;
 
 trait Attachmentable
 {
@@ -22,9 +23,16 @@ trait Attachmentable
         return $this->attachments->where('key', $key)->first();
     }
 
-    public function attachOne(UploadedFile $file, array $option = null)
+    public function attach($file, array $options = null): bool
     {
-        # code...
+        $attachmentService = resolve(AttachmentService::class);
+
+        if ($file instanceof UploadedFile)
+        {
+            $attachmentService->attach($file, $this);
+        }
+
+        return false;
     }
 
     public function hasAttachment($key)
@@ -37,12 +45,7 @@ trait Attachmentable
         # code...
     }
 
-    public function attachFromUrl($url, array $option = null)
-    {
-        # code...
-    }
-
-    public function attach($files, array $option = null)
+    public function attachFromUrl($url, array $options = null)
     {
         # code...
     }
