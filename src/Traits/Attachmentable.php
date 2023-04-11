@@ -14,26 +14,23 @@ trait Attachmentable
         return $this->morphMany(Attachment::class, 'attachmentable', 'attachmentables');
     }
 
-    public function attachment(string $key)
+    public function attachment($id)
     {
-        return $this->attachments->where('key', $key)->first();
+        return $this->attachments()->find($id)->first();
     }
 
-    public function attach($file, $path = null): bool
+    public function attach($file, $path): bool
     {
-        $attachmentService = resolve(AttachmentService::class);
-
-//        if (empty($fileOrPath)) {
-//            throw new \Exception('Attached file is required');
-//        }
-//
-        if ($file instanceof UploadedFile)
-        {
-            if(! $attachmentService->attach($file, $this)) return false;
-            return true;
+        if (empty($path)) {
+            throw new \Exception('path for attach file is required');
         }
 
-        return false;
+        $attachmentService = resolve(AttachmentService::class);
+
+        if (!$attachmentService->attach($file, $this, $path)) return false;
+
+        return true;
+
     }
 
     public function detach(): bool

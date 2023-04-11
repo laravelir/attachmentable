@@ -3,6 +3,7 @@
 namespace Laravelir\Attachmentable\Services;
 
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 abstract class Service
 {
@@ -10,7 +11,8 @@ abstract class Service
 
     public string $ds = DIRECTORY_SEPARATOR;
 
-    public string $defaultUploadFolderName;
+    public string $base_directory;
+
 
     // attachment model
     public $model;
@@ -23,7 +25,7 @@ abstract class Service
     public function setupSetting()
     {
         $this->setDisk(config('attachmentable.disk'));
-        $this->defaultUploadFolderName = config('attachmentable.behaviors.uploads.default_directory');
+        $this->base_directory = config('attachmentable.base_directory');
         $this->model = config('attachmentable.attachment_model');
     }
 
@@ -39,18 +41,24 @@ abstract class Service
     }
 
     /**
-     * return upload path.
-     *
+     * @param $path
      * @return string
+     * result =
      */
-    protected function path()
+    public function generatePath($path): string
     {
-        return storage_path() . '/app';
-    }
 
-    public function path2($path)
-    {
-        return $this->defaultUploadFolderName . $this->ds . $path;
+        $year = Carbon::now()->year;
+        $month = Carbon::now()->month;
+        $day = Carbon::now()->day;
+
+        if ($this->isLocalStorage()) {
+            $st_path = storage_path('app');
+        } else if ($this->isPublicStorage()) {
+            $st_path = storage_path() . $this->ds . 'app' . $this->ds . 'public';
+        }
+
+        return "{$st_path}{$this->ds}{$this->base_directory}{$this->ds}{$path}{$this->ds}{$year}{$this->ds}{$month}{$this->ds}{$day}";
     }
 
     protected function isLocalStorage(): bool
@@ -82,10 +90,16 @@ abstract class Service
         }
     }
 
-    public function setFileMetadata($file)
+    public function setFileMetadata($file): array
     {
+//        $fileName = $file->getFilename();
+//        $originalFileName = $file->getClientOriginalName();
+
         $data = [
             'ext' => $file->getClientOriginalExtension(),
+            'mime' => $file->getClientMimeType(),
+            'size' => method_exists($file, 'getSize') ? $file->getSize() : $file->getClientSize(),
+
         ];
 
         return $data;

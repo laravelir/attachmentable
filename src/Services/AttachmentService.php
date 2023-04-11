@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Intervention\Image\Facades\Image;
-use Laravelir\Attachmentable\Models\Attachment;
 
 
 final class AttachmentService extends Service
@@ -22,9 +21,9 @@ final class AttachmentService extends Service
         parent::__construct();
     }
 
-    public function attach($file, $attachmentable)
+    public function attach($file, $attachmentable, $path)
     {
-        if (!$file instanceof UploadedFile && $file->isValid()) {
+        if (!$file instanceof UploadedFile && !$file->isValid()) {
             return false;
         }
 
@@ -32,21 +31,27 @@ final class AttachmentService extends Service
             return false;
         }
 
-        $uploadedFilePath = $this->upload($file);
+        $uploadedFilePath = $this->upload($file, $path);
 
         if ($uploadedFilePath == false) {
             return false;
         }
 
-        $attachmentable->attachments()->create([
+        $created = $attachmentable->attachments()->create([
             'attachmentorable_id' => auth()->user()->id,
             'attachmentorable_type' => get_class(auth()->user()),
             'attachmentable_id' => $attachmentable->id,
             'attachmentable_type' => get_class($attachmentable),
             'path' => $uploadedFilePath,
             'disk' => $this->disk,
+            'meta' => $this->setFileMetadata($file),
         ]);
 
+        if (!$created) {
+            return false;
+        }
+
+        return true;
     }
 
     public function detach($file)
@@ -54,90 +59,31 @@ final class AttachmentService extends Service
         $this->disk()->delete($file);
     }
 
-    public function upload(UploadedFile $file, $path = null)
+    public function upload($file, $path)
     {
-        $path = $this->path($path);
+        $destinationPath = $this->generatePath($path);
 
-        $year = Carbon::now()->year;
-        $month = Carbon::now()->month;
-        $day = Carbon::now()->day;
+        $fileName = now()->timestamp . '-' . $file->getClientOriginalName();
 
-        $fileName = $file->getFilename();
-        $originalFileName = $file->getClientOriginalName();
-        $fileExt = $file->getClientOriginalExtension();
-        $mimeType = $file->getClientMimeType();
-        $fileSize = method_exists($file, 'getSize') ? $file->getSize() : $file->getClientSize();
+        $this->mkdir_if_not_exists($destinationPath);
 
-        $uploadPath = "{$path}{$this->ds}{$year}{$this->ds}{$month}{$this->ds}{$day}";
+        $file->move($destinationPath, $fileName);
 
-        $fullUploadedPath = public_path($uploadPath . $this->ds . $fileName);
-
-        $dirPath = public_path($uploadPath);
-
-        $this->mkdir_if_not_exists($dirPath);
-
-        if (file_exists($fullUploadedPath)) {
-            $finalFileName = Carbon::now()->timestamp . "-{$fileName}";
-
-            $file->move($dirPath, $finalFileName);
-
-
-            return $uploadPath . $this->ds . $finalFileName;
-        }
-
-        $file->move($dirPath, $fileName);
-
-        return $uploadPath . $this->ds . $fileName;
-    }
-
-    public function uploadImage(UploadedFile $uploadedFile, $path = null)
-    {
-
-        $path = $this->path($path);
-
-        if ($uploadedFile->isValid()) {
-
-            $image = Image::make($uploadedFile->getRealPath());
-            $year = Carbon::now()->year;
-            $month = Carbon::now()->month;
-            $day = Carbon::now()->day;
-
-            $fileName = $uploadedFile->getClientOriginalName();
-            $fileExt = $uploadedFile->getClientOriginalExtension();
-            $mimeType = $uploadedFile->getClientMimeType();
-            $fileSize = $uploadedFile->getSize();
-
-            $uploadPath = "{$path}{$this->ds}{$year}{$this->ds}{$month}{$this->ds}{$day}";
-
-            $fullUploadedPath = public_path($uploadPath . $this->ds . $fileName);
-
-            $dirPath = public_path($uploadPath);
-
-            $this->mkdir_if_not_exists($dirPath);
-
-            if (file_exists($fullUploadedPath)) {
-                $finalFileName = Carbon::now()->timestamp . "-{$fileName}";
-
-                $image->save($dirPath . $this->ds . $finalFileName);
-
-                return $uploadPath . $this->ds . $finalFileName;
-            }
-
-            $image->save($fullUploadedPath);
-
-            return $uploadPath . $this->ds . $fileName;
-        }
-
-        return false;
+        return $destinationPath . $this->ds . $fileName;
     }
 
     function mkdir_if_not_exists($dirPath)
     {
-        if (!file_exists($dirPath)) {
-            mkdir($dirPath, 0777, true);
+        if (!$this->disk()->exists($dirPath)) {
+            $this->disk()->makeDirectory($dirPath);
         }
     }
 
+    public function uploadImage(UploadedFile $uploadedFile, $path = null)
+    {
+//      $image = Image::make($uploadedFile->getRealPath());
+    }
+    
     public function isFile($file): bool
     {
         return true;

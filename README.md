@@ -84,15 +84,17 @@ class PostController extends Controller
 {
     public function index()
     {
+        $file = request()->file('thumbnail');
+        
         $post = Post::find(1);
+
+        $post->attach($file, "posts/thumbnails");
 
         $post->attachments // return all attachments
 
-        $post->attachment($file, $disk, $name); // return attachment 
-        
-        $post->attach();
-        
-        $post->detach();
+        $post->attachment($id); // return attachment 
+               
+        $post->detach($id);
         
         $post->clearAttachments();
        

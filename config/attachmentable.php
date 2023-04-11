@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Storage;
 return [
 
     /**
-     * use your favorite filesystem.php disk
+     * use local - public
      */
     'disk' => env('ATTACHMENTABLE_DISK', Storage::getDefaultDriver()),
 
@@ -27,7 +27,6 @@ return [
         'cascade_delete' => true,
 
         'uploads' => [
-            'default_directory' =>'uploads',
 
             /**
              * url : url($path)
