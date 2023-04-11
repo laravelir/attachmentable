@@ -1,9 +1,11 @@
 add cleaner
 
-add attach from url, stream ,
+add attach from uploadedFile, remote url, stream, sockets, ...
 
-add image optimizer
+add image service: optimizer, resizer
 
-add jobs, events for upload, image process
+add jobs, events for upload, image process, ...
 
 add file to attachmentable by specific user logged in or ...
+
+

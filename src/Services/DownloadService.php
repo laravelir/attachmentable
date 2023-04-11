@@ -9,7 +9,7 @@ final class DownloadService extends Service
         parent::__construct();
     }
 
-    public function download()
+    public function download($file, $options = null)
     {
         //
     }

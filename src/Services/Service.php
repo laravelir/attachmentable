@@ -84,5 +84,76 @@ abstract class Service
     }
 
 
+    public function getFileMetadata($key, $default = null)
+    {
+        if (is_null($key)) {
+            return $this->metadata;
+        }
+
+        return Arr::get($this->metadata, $key, $default);
+    }
+
+    /**
+     * Generate a temporary url at which the current file can be downloaded until $expire
+     *
+     * @param Carbon $expire
+     * @param bool $inline
+     *
+     * @return string
+     */
+    public function getTemporaryUrl(Carbon $expire, $inline = false)
+    {
+
+        $payload = Crypt::encryptString(collect([
+            'id' => $this->uuid,
+            'expire' => $expire->getTimestamp(),
+            'shared_at' => Carbon::now()->getTimestamp(),
+            'disposition' => $inline ? 'inline' : 'attachment',
+        ])->toJson());
+
+        return route('attachments.download-shared', ['token' => $payload]);
+
+    }
+
+    protected function isDirectoryEmpty($dir)
+    {
+        if ( ! $dir || ! $this->storageCommand('exists', $dir)) {
+            return null;
+        }
+
+        return count($this->storageCommand('allFiles', $dir)) === 0;
+    }
+
+
+    protected function copyToStorage($localPath, $storagePath)
+    {
+        return Storage::disk($this->disk)->put($storagePath, FileHelper::get($localPath));
+    }
+
+    protected function deleteEmptyDirectory($dir = null)
+    {
+        if ( ! $this->isDirectoryEmpty($dir)) {
+            return;
+        }
+
+        $this->storageCommand('deleteDirectory', $dir);
+
+        $dir = dirname($dir);
+
+        if ( ! $this->isDirectoryEmpty($dir)) {
+            return;
+        }
+
+        $this->storageCommand('deleteDirectory', $dir);
+
+        $dir = dirname($dir);
+
+        if ( ! $this->isDirectoryEmpty($dir)) {
+            return;
+        }
+
+        $this->storageCommand('deleteDirectory', $dir);
+    }
+
 
 }
