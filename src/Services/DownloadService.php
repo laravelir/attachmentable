@@ -13,20 +13,21 @@ final class DownloadService extends Service
 
     public function download($id, Request $request)
     {
-        $disposition = ($disposition = $request->input('disposition')) === 'inline' ? $disposition : 'attachment';
-
-        if ($file = $this->model->where('uuid', $id)->first()) {
-            try {
-                if (!$file->output($disposition)) {
-                    abort(403, Lang::get('attachments::messages.errors.access_denied'));
-                }
-            } catch (FileNotFoundException $e) {
-                abort(404, Lang::get('attachments::messages.errors.file_not_found'));
-            }
-        }
-
-        abort(404, Lang::get('attachments::messages.errors.file_not_found'));
+        if ($file = $this->model->where('uuid', $id)->first()) {}
     }
 
+    public function output($disposition = 'inline')
+    {
+
+        header("Content-type: " . $this->filetype);
+        header('Content-Disposition: ' . $disposition . '; filename="' . $this->filename . '"');
+        header('Cache-Control: private');
+        header('Cache-Control: no-store, no-cache, must-revalidate');
+        header('Cache-Control: pre-check=0, post-check=0, max-age=0');
+        header('Accept-Ranges: bytes');
+        header('Content-Length: ' . $this->filesize);
+
+        exit($this->getContents());
+    }
 
 }

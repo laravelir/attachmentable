@@ -16,15 +16,6 @@ trait Attachmentorable
 
     public function attach(Model $model, UploadedFile $file, array $option = null): bool
     {
-        if (!$model instanceof Model) {
-            return false;
-        }
-
-        $model->attachments()->create([
-            'attachmentorable_id' => $this->id,
-            'attachmentorable_type' => get_class($this),
-        ]);
-
         return true;
     }
 

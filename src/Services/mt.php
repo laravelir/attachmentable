@@ -33,4 +33,8 @@
 //    return $this;
 //}
 
-
+//
+//public function attachFromUrl($url, array $options = null)
+//{
+//    # code...
+//}

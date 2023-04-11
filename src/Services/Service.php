@@ -82,7 +82,6 @@ abstract class Service
         }
     }
 
-
     public function setFileMetadata($file)
     {
         $data = [
