@@ -2,7 +2,7 @@
     "name": "laravelir/attachmentable",
     "description": "A package for attachment files to models",
     "homepage": "https://github.com/laravelir/attachmentable",
-    "version": "0.2.0",
+    "version": "0.2.5",
     "type": "library",
     "keywords": [
         "laravel",
