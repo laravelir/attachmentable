@@ -23,10 +23,14 @@ trait Attachmentable
         return $this->attachments->where('key', $key)->first();
     }
 
-    public function attach($file, array $options = null): bool
+    public function attach($file, $path = null): bool
     {
         $attachmentService = resolve(AttachmentService::class);
 
+//        if (empty($fileOrPath)) {
+//            throw new \Exception('Attached file is required');
+//        }
+//
         if ($file instanceof UploadedFile)
         {
             if(! $attachmentService->attach($file, $this)) return false;
@@ -90,60 +94,5 @@ trait Attachmentable
         # code
     }
 
-    public function download($id, Request $request)
-    {
-        $disposition = ($disposition = $request->input('disposition')) === 'inline' ? $disposition : 'attachment';
 
-        if ($file = $this->model->where('uuid', $id)->first()) {
-            try {
-                /** @var \Bnb\Laravel\Attachments\Attachment $file */
-                if (!$file->output($disposition)) {
-                    abort(403, Lang::get('attachments::messages.errors.access_denied'));
-                }
-            } catch (FileNotFoundException $e) {
-                abort(404, Lang::get('attachments::messages.errors.file_not_found'));
-            }
-        }
-
-        abort(404, Lang::get('attachments::messages.errors.file_not_found'));
-    }
-
-    public function attach2($fileOrPath, $options = [])
-    {
-        if (!is_array($options)) {
-            throw new \Exception('Attachment options must be an array');
-        }
-
-        if (empty($fileOrPath)) {
-            throw new \Exception('Attached file is required');
-        }
-
-        $attributes = Arr::only($options, config('attachments.attributes'));
-
-        if (!empty($attributes['key']) && $attachment = $this->attachments()->where('key', $attributes['key'])->first()) {
-            $attachment->delete();
-        }
-
-        /** @var Attachment $attachment */
-        $attachment = app(AttachmentContract::class)->fill($attributes);
-        $attachment->filepath = !empty($attributes['filepath']) ? $attributes['filepath'] : null;
-
-        if (is_resource($fileOrPath)) {
-            if (empty($options['filename'])) {
-                throw new \Exception('resources required options["filename"] to be set?');
-            }
-
-            $attachment->fromStream($fileOrPath, $options['filename']);
-        } elseif ($fileOrPath instanceof UploadedFile) {
-            $attachment->fromPost($fileOrPath);
-        } else {
-            $attachment->fromFile($fileOrPath);
-        }
-
-        if ($attachment = $this->attachments()->save($attachment)) {
-            return $attachment;
-        }
-
-        return null;
-    }
 }

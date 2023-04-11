@@ -83,6 +83,15 @@ abstract class Service
     }
 
 
+    public function setFileMetadata($file)
+    {
+        $data = [
+            'ext' => $file->getClientOriginalExtension(),
+        ];
+
+        return $data;
+    }
+
     public function getFileMetadata($key, $default = null)
     {
         if (is_null($key)) {
@@ -116,7 +125,7 @@ abstract class Service
 
     protected function isDirectoryEmpty($dir)
     {
-        if ( ! $dir || ! $this->storageCommand('exists', $dir)) {
+        if (!$dir || !$this->storageCommand('exists', $dir)) {
             return null;
         }
 
@@ -130,7 +139,7 @@ abstract class Service
 
     protected function deleteEmptyDirectory($dir = null)
     {
-        if ( ! $this->isDirectoryEmpty($dir)) {
+        if (!$this->isDirectoryEmpty($dir)) {
             return;
         }
 
@@ -138,7 +147,7 @@ abstract class Service
 
         $dir = dirname($dir);
 
-        if ( ! $this->isDirectoryEmpty($dir)) {
+        if (!$this->isDirectoryEmpty($dir)) {
             return;
         }
 
@@ -146,7 +155,7 @@ abstract class Service
 
         $dir = dirname($dir);
 
-        if ( ! $this->isDirectoryEmpty($dir)) {
+        if (!$this->isDirectoryEmpty($dir)) {
             return;
         }
 

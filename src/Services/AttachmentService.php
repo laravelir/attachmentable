@@ -23,20 +23,27 @@ final class AttachmentService extends Service
 
     public function attach($file, $attachmentable)
     {
-        if (! $file instanceof UploadedFile && $file->isValid()) {
+        if (!$file instanceof UploadedFile && $file->isValid()) {
             return false;
         }
 
-        if(! $attachmentable instanceof Model) {
+        if (!$attachmentable instanceof Model) {
             return false;
         }
 
+        $uploadedFilePath = $this->upload($file);
 
-        // $this->disk()->put();
+        if ($uploadedFilePath == false) {
+            return false;
+        }
 
         $attachmentable->attachments()->create([
             'attachmentorable_id' => auth()->user()->id,
             'attachmentorable_type' => get_class(auth()->user()),
+            'attachmentable_id' => $attachmentable->id,
+            'attachmentable_type' => get_class($attachmentable),
+            'path' => $uploadedFilePath,
+            'disk' => $this->disk,
         ]);
 
 
@@ -47,7 +54,7 @@ final class AttachmentService extends Service
         $this->disk()->delete($file);
     }
 
-    public function uploadFile(UploadedFile $file, $path = null)
+    public function upload(UploadedFile $file, $path = null)
     {
         $path = $this->path($path);
 
@@ -145,13 +152,15 @@ final class AttachmentService extends Service
         exit($this->getContents());
     }
 
-    public function isFile($file):bool {
+    public function isFile($file): bool
+    {
         return true;
     }
 
-    public function isImage($file):bool {
+    public function isImage($file): bool
+    {
         return true;
-
     }
+
 
 }
