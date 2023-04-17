@@ -5,6 +5,7 @@ namespace Laravelir\Attachmentable\Services;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 
 
@@ -65,9 +66,10 @@ final class AttachmentService extends Service
 
         $fileName = now()->timestamp . '-' . $file->getClientOriginalName();
 
-        $this->mkdir_if_not_exists($destinationPath);
+//        $this->mkdir_if_not_exists($destinationPath);
 
-        $file->move($destinationPath, $fileName);
+        //$this->disk()->put();
+        $this->disk()->putFileAs($destinationPath, $file, $fileName);
 
         return $destinationPath . $this->ds . $fileName;
     }
@@ -83,7 +85,7 @@ final class AttachmentService extends Service
     {
 //      $image = Image::make($uploadedFile->getRealPath());
     }
-    
+
     public function isFile($file): bool
     {
         return true;
