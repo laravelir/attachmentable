@@ -66,7 +66,7 @@ final class AttachmentService extends Service
 
         $fileName = now()->timestamp . '-' . $file->getClientOriginalName();
 
-//        $this->mkdir_if_not_exists($destinationPath);
+        //        $this->mkdir_if_not_exists($destinationPath);
 
         //$this->disk()->put();
         $this->disk()->putFileAs($destinationPath, $file, $fileName);
@@ -83,7 +83,7 @@ final class AttachmentService extends Service
 
     public function uploadImage(UploadedFile $uploadedFile, $path = null)
     {
-//      $image = Image::make($uploadedFile->getRealPath());
+        //      $image = Image::make($uploadedFile->getRealPath());
     }
 
     public function isFile($file): bool
@@ -96,4 +96,29 @@ final class AttachmentService extends Service
         return true;
     }
 
+    public function attachFromUrl($url, array $options = null)
+    {
+        # code...
+    }
+
+    public function attachFromStream($stream, $filename, $disk = null)
+    {
+        if ($stream === null) {
+            return null;
+        }
+
+        $this->disk = $this->disk ?: ($disk ?: Storage::getDefaultDriver());
+
+        $driver = Storage::disk($this->disk);
+
+        $this->filename = $filename;
+        $this->filepath = $this->filepath ?: ($this->getStorageDirectory() . $this->getPartitionDirectory() . $this->getDiskName());
+
+        $driver->putStream($this->filepath, $stream);
+
+        $this->filesize = $driver->size($this->filepath);
+        $this->filetype = $driver->mimeType($this->filepath);
+
+        return $this;
+    }
 }
